@@ -1,0 +1,10 @@
+.container-title {
+    display: flex;
+    justify-content: center;
+    gap: 0.25rem;
+}
+
+.tracks-title_text {
+    font-weight: 600;
+    color: $secondaryDarker;
+}
