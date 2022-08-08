@@ -1,0 +1,36 @@
+$header-height: 100px;
+$footer-height: 0px;
+$main-padding: 20px;
+
+html {
+    box-sizing: border-box;
+    scroll-behavior: smooth;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: inherit;
+}
+
+.body {
+    min-height: 100vh;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    color: rgb(49, 49, 49);
+    font-family: Roboto, sans-serif;
+    font-weight: 500;
+    letter-spacing: 1.25px;
+}
+
+.main {
+    padding: 1rem 0;
+    background-color: $secondaryLighter;
+    min-height: calc(100vh - ($header-height + $footer-height));
+}
+
+.line {
+    border-bottom: 3px solid $primary; /* Параметры линии */
+}
