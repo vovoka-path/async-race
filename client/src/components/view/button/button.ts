@@ -1,18 +1,19 @@
 import ButtonController from '../../controller/button-controller';
+import { ObserverFunction } from '../../types/types';
 // import { Data } from '../../types/types';
 
-class Button{
+class Button {
     name: string;
+    id: string;
     controller: ButtonController;
     button: HTMLButtonElement;
-    constructor(name: string) {
+    callback: ObserverFunction;
+    constructor(name: string, id?: string) {
         this.name = name;
-        this.controller = new ButtonController(name);
-
-        const button = document.createElement('button');
-        button.setAttribute('type', 'button');
-        button.textContent = name;
-        this.button = button;
+        this.id = id ? id : '';
+        this.controller = new ButtonController(name, this.id);
+        this.button = this.getHTMLButtonElement();
+        this.callback = () => null;
     }
 
     init(parentNode: Element) {
@@ -20,15 +21,27 @@ class Button{
         parentNode.append(this.button);
     }
 
-    setListeners() {
-        this.button.onclick = () => {
-            this.controller.submit({ name: this.name });
-            this.controller.broadcast({ name: this.name });
-        }
+    setCallback(cb: ObserverFunction) {
+        // console.log('cb = ', cb);
+        // this.controller.setCallback(cb);
+        this.callback = cb;
     }
 
-    destroy() {
-        this.button.remove();
+    private setListeners() {
+        this.button.onclick = () => {
+            this.controller.submit(this.name);
+            this.controller.broadcast(this.name);
+        };
+    }
+
+    private getHTMLButtonElement() {
+        const button = document.createElement('button');
+        button.className = `button button-${this.name}`;
+        button.setAttribute('type', 'button');
+        button.setAttribute('id', this.id);
+        button.textContent = this.name;
+
+        return button;
     }
 }
 

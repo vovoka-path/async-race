@@ -1,0 +1,40 @@
+.container-car-name {
+    padding: 5px;
+}
+
+.container-buttons {
+    padding: 5px;
+}
+
+.button {
+    width: 70px;
+    height: 32px;
+    border: 0;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: 600;
+    color: $secondary;
+    cursor: pointer;
+    background-color: $primaryLighter;
+    box-shadow: -1px -1px 20px 2px rgba(230, 138, 23, 0.6) inset;
+    transition: 0.5s;
+}
+
+.container-setting {
+    & .button {
+        width: 120px;
+    }
+}
+
+.button:hover {
+    background-color: $primaryLight;
+}
+
+.button:active {
+    transform: scale(0.97);
+	transition: 0.1s;
+}
+
+.button:disabled {
+    box-shadow: 0;
+}
