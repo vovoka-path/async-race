@@ -1,3 +1,4 @@
+import './styles.scss';
 import View from '../view/view';
 
 class App {
