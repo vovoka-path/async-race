@@ -1,22 +1,35 @@
-import { Data } from '../types/types';
+import { CarData, CBfunc, ObserverFunction } from '../types/types';
 
 class Observer {
-    subscribers: Function[];
+    subscribers: (ObserverFunction | CBfunc)[];
     constructor() {
         this.subscribers = [];
     }
 
-    subscribe(fn: Function) {
+    subscribe(fn: ObserverFunction | CBfunc) {
         this.subscribers.push(fn);
     }
 
-    unsubscribe(fn: Function) {
-        this.subscribers.filter((subscriber) => subscriber !== fn);
-    }
+    // unsubscribe(fn: ObserverFunction) {
+    //     this.subscribers.filter((subscriber) => subscriber !== fn);
+    // }
 
-    broadcast(data: Data) {
-        this.subscribers.forEach((subscriber) => subscriber(data));
+    broadcast(data: CarData | string | number) {
+        // console.log('this.subscribers.length = ', this.subscribers.length);
+        this.subscribers.forEach((subscriber: ObserverFunction | CBfunc) => {
+            // if (typeof data === 'number') {
+            subscriber(data as number);
+            // }
+        });
     }
 }
 
 export default Observer;
+
+// if (typeof data === 'string') {
+//     subscriber(data as string);
+// } else if (typeof data === 'number') {
+//     subscriber(data as number);
+// } else {
+//     subscriber(data as CarData);
+// }
