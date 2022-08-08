@@ -1,16 +1,16 @@
 import Nav from './nav/nav';
 import Main from './main/main';
-import Footer from './footer/footer';
+// import Footer from './footer/footer';
 import { ObserverFunction } from '../types/types';
 
 class View {
     private nav: Nav;
     private main: Main;
-    private footer: Footer;
+    // private footer: Footer;
     constructor() {
         this.nav = new Nav();
         this.main = new Main();
-        this.footer = new Footer();
+        // this.footer = new Footer();
         this.subscribeMainToNav();
     }
 

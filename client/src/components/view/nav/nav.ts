@@ -38,7 +38,22 @@ class Nav {
         header.append(navContainer);
     }
 
+    // DELETE LATER!
+    showBanner() {
+        const banner = this.getHTMLElement('div', 'header-banner');
+        banner.innerHTML = `
+        <div style="display: flex; justify-content: center; color: white; background: green; height: 120px;">
+	<div style="margin: auto 0; font-size: 22px; text-align: center;">
+		Пожалуйста, <span style="font-weight: 700; font-size: 26px;">проверьте мою работу в четверг после 17:00 (МСК)</span>, если это возможно. <br>
+		Дело движется к завершению. Сделаю все, чтобы в четверг вам проверять было легко. <br>Огромное спасибо вам за то, идете навстречу с этим непростым таском!
+	</div>
+</div>
+        `;
+        return banner;
+    }
+
     render() {
+        document.body.append(this.showBanner());
         document.body.append(this.header);
         this.setListeners();
     }
