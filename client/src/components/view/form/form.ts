@@ -1,6 +1,6 @@
 // import styles from './form-input-styles.scss';
-import ControllerForm from '../../controller/form-controller';
-import { Data, MethodList } from '../../types/types';
+import FormController from '../../controller/form-controller';
+import { FormsData, CarData, ObserverFunction } from '../../types/types';
 
 // const controller = new ControllerForm();
 
@@ -9,98 +9,158 @@ import { Data, MethodList } from '../../types/types';
 //     'update': controller.setInputUpdate,
 // }
 
-class Form{
+class Form {
     name: string;
-    controller: ControllerForm;
-    data: Data;
+    id: string;
+    controller: FormController;
+    data: CarData;
+    formsData: FormsData;
     form: Element;
     inputText: HTMLInputElement;
     inputColor: HTMLInputElement;
     labelColor: HTMLLabelElement;
     button: HTMLButtonElement;
-    constructor(formName: string) {
+    callback: ObserverFunction;
+    constructor(formName: string, id?: string) {
         this.name = formName;
-        this.controller = new ControllerForm(this.name);
+        this.id = id ? id : '';
+        this.controller = new FormController(this.name);
+        this.formsData = this.controller.getFormDataFromStorage();
+        this.callback = () => null;
         this.data = {
-            input: '',
-            color: '',
             name: '',
+            color: '',
         };
 
-        const form = document.createElement('div');
-        this.form = form;
+        this.inputText = this.getHTMLInputTextElement();
+        this.inputColor = this.getHTMLInputColorElement();
+        this.labelColor = this.getHTMLLabelColorElement();
+        this.button = this.getHTMLButtonElement();
 
-        const inputText = document.createElement('input');
-        inputText.setAttribute('type', 'text');
-        this.inputText = inputText;
-        form.append(inputText);
-
-        const colorValue = 'color';
-
-        const inputColor = document.createElement('input');
-        inputColor.className = 'input-color';
-        inputColor.setAttribute('type', 'color');
-        inputColor.setAttribute('name', colorValue);
-        this.inputColor = inputColor;
-        form.append(inputColor);
-
-        const labelColor = document.createElement('label');
-        labelColor.className = 'label-color';
-        labelColor.setAttribute('for', colorValue);
-        this.labelColor = labelColor;
-        form.append(labelColor);
-
-        const button = document.createElement('button');
-        button.setAttribute('type', 'button');
-        button.textContent = formName;
-        this.button = button;
-        form.append(button);
+        this.form = this.getHTMLFormElement();
     }
 
     init(parentNode: Element) {
+        // if (this.form) this.destroy();
         this.setListeners();
         parentNode.append(this.form);
     }
 
-    setListeners() {
-        const actionMethods: MethodList = {
-            'input': this.controller.input,
-            'submit': this.controller.submit,
-        }
-        
-        const callback = (action: string) => {
-            return () => {
-                actionMethods[action](this.getData());
-                this.controller.broadcast(this.getData());
-            }
-        }
+    setCallback(cb: ObserverFunction) {
+        // console.log('cb = ', cb);
+        // this.controller.setCallback(cb);
+        this.callback = cb;
+    }
 
-        this.inputText.oninput = callback('input');
-        this.inputColor.oninput = callback('input');
-        this.button.onclick = callback('submit');
+    setListeners() {
+        this.inputText.oninput = () => {
+            this.controller.input(this.getData());
+            // this.controller.broadcast(this.getData());
+        };
+
+        this.inputColor.oninput = () => {
+            this.controller.input(this.getData());
+            // this.controller.broadcast(this.getData());
+        };
+
+        this.button.onclick = () => {
+            this.controller.submit(this.getData());
+            this.controller.broadcast(this.getData());
+        };
+        // const actionMethods: InputMethodList = {
+        //     input: this.controller.input,
+        //     submit: this.controller.submit,
+        // };
+
+        // const callback = (action: string) => {
+        //     return () => {
+        //         actionMethods[action](this.getData());
+        //         this.controller.broadcast(this.getData());
+        //     };
+        // };
+
+        // this.inputText.oninput = callback('input');
+        // this.inputColor.oninput = callback('input');
+        // this.button.onclick = callback('submit');
     }
 
     getData() {
         // console.log('getData() = ', this.inputText.value)
-        return {
-            input: this.inputText.value,
+        const data: CarData = {
+            name: this.inputText.value,
             color: this.inputColor.value,
-            name: this.button.textContent,
-        } as Data;
+            id: +this.id,
+        };
+
+        return data;
     }
 
-    setData(data: Data) {
-        this.data = {...this.data, ...data};
+    setData(data: CarData) {
+        this.data = { ...this.data, ...data };
         // console.log('setData() this.data = ', this.data)
-        this.inputText.value = this.data.input;
+        this.inputText.value = this.data.name;
         this.inputColor.value = this.data.color;
-        this.button.textContent = this.data.name;
+        this.button.textContent = this.name;
         // console.log('setData() this.data.input = ', this.data.input)
         // console.log('setData() this.inputText.value = ', this.inputText.value)
     }
-    
-    destroy() {
-        this.form.remove();
+
+    getFormDataFromStorage() {
+        // console.log(
+        //     'name =',
+        //     name,
+        //     'this.controller.getFormDataFromStorage() as FormData = ',
+        //     this.controller.getFormDataFromStorage() as FormsData
+        // );
+
+        return this.controller.getFormDataFromStorage() as FormsData;
+    }
+
+    private getHTMLFormElement() {
+        const form = document.createElement('div');
+        form.className = 'form form-create';
+
+        form.append(this.inputText);
+        form.append(this.inputColor);
+        form.append(this.labelColor);
+        form.append(this.button);
+
+        return form;
+    }
+
+    private getHTMLInputTextElement() {
+        const inputText = document.createElement('input');
+        inputText.className = `input input-text input-text-${this.name}`;
+        inputText.setAttribute('type', 'text');
+
+        return inputText;
+    }
+
+    private getHTMLInputColorElement() {
+        const inputColor = document.createElement('input');
+        inputColor.className = `input input-color input-color-${this.name}`;
+        inputColor.setAttribute('type', 'color');
+        inputColor.setAttribute('name', 'color');
+
+        return inputColor;
+    }
+
+    private getHTMLLabelColorElement() {
+        const labelColor = document.createElement('label');
+        labelColor.className = `label label-color label-${this.name}`;
+        labelColor.setAttribute('for', 'color');
+
+        return labelColor;
+    }
+
+    private getHTMLButtonElement() {
+        const button = document.createElement('button');
+        button.className = `button button-form button-${this.name}`;
+        button.setAttribute('type', 'button');
+        button.textContent = this.name;
+        this.id ? button.setAttribute('id', this.id) : null;
+
+        return button;
     }
 }
 
