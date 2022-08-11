@@ -5,6 +5,8 @@ import Cars from './cars';
 // import TrackButton from '../button/track-button';
 import { CarData } from '../../types/types';
 
+const carImageWidth = '75px';
+
 class Track {
     carData: CarData;
     name: string;
@@ -17,7 +19,9 @@ class Track {
     // editButton: Button;
     deleteButton: Button;
     updateForm: Form;
-    cars: Cars;
+    carImage: Cars;
+    car: HTMLElement;
+    carAnimation: Animation | undefined;
     constructor(carData: CarData) {
         this.carData = carData;
         const { name, color, id } = carData;
@@ -34,7 +38,21 @@ class Track {
         // this.editButton = new Button('edit', this.id);
         this.deleteButton = new Button('delete', this.id);
         this.updateForm = new Form('update', this.id);
-        this.cars = new Cars();
+        this.carImage = new Cars();
+        this.car = this.getCar();
+    }
+
+    animationCar(time: number): void {
+        this.carAnimation = this.car.animate([{ left: '75px' }, { left: `calc(100% - ${carImageWidth}px)` }], {
+            duration: time,
+            easing: 'ease-in-out',
+        });
+        if (this.carAnimation) {
+            this.carAnimation.play();
+            this.carAnimation.onfinish = () => {
+                this.car.style.left = `calc(100% - ${carImageWidth}px)`;
+            };
+        }
     }
 
     getTrackContainer() {
@@ -69,7 +87,7 @@ class Track {
 
         const carName = document.createElement('div');
         carName.className = 'car-name_title';
-        carName.innerText = `#${this.id} - Model: ${this.name}, Color: ${this.color}`;
+        carName.innerText = `#${this.id} ${this.name} (color: ${this.color})`;
 
         carContainer.append(carName);
 
@@ -97,14 +115,21 @@ class Track {
         const bottomLine = this.getLine();
 
         const svgContainer = this.getHTMLElement('div', 'container-svg');
-        svgContainer.innerHTML = this.cars.getSportcar(this.color);
-        // svgContainer.append(car);
+        svgContainer.append(this.getCar());
 
         // container.append(topLine);
         container.append(svgContainer);
         container.append(bottomLine);
 
         return container;
+    }
+
+    private getCar() {
+        const car = this.getHTMLElement('div', 'car-svg');
+        car.innerHTML = this.carImage.getSportcar(this.color);
+        car.setAttribute('id', `car-${this.id}`);
+
+        return car;
     }
 
     private getLine(): HTMLElement {

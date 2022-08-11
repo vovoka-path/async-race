@@ -1,20 +1,25 @@
-import TrackController from '../../controller/track-controller';
+// import TrackController from '../../controller/track-controller';
+import TracksController from '../../controller/tracks-controller';
 import Track from '../track/track';
 import { CarData, CarsData, CBfunc } from '../../types/types';
+import Observer from '../../controller/observer';
 // import App from '../../app/app';
 
-class Tracks {
-    controller: TrackController;
+class Tracks extends Observer {
+    controller = new TracksController();
     // page: number;
     // cars: CarsData;
     element: HTMLElement;
     trackElements: Element[];
     rerenderCallback: CBfunc;
+    // title: Promise<HTMLElement>;
     constructor() {
-        this.controller = new TrackController();
+        super();
+        // this.controller = new TracksController();
         // this.page = this.getCarsCurrentPage() || 0;
         this.trackElements = [];
         this.rerenderCallback = () => null;
+        // this.title = this.createTitle(currentPage);
         // this.cars = {
         //     count: '0',
         //     data: [],
@@ -26,24 +31,49 @@ class Tracks {
         // console.log('# TRACKS constructor: this.trackElements = ', this.trackElements);
     }
 
-    setRerenderCallback(cb: CBfunc) {
-        // console.log('cb = ', cb);
-        this.rerenderCallback = cb;
+    async createTitle(currentPage: number) {
+        const carCount = await this.controller.getCarsCount();
+        // const currentPage = await this.controller.getCarsCurrentPage();
+        // console.log('## TRacks init()| carsPage =', currentPage);
+        // title = this.getTitle(`Garage contains ${carCount} cars. Box: ${carsPage}.`);
+        return this.getTitle(`Garage contains ${carCount} cars. Box: ${currentPage}.`);
+    }
+
+    async rerenderTracksTitle(parentNode: Element, currentPage: number) {
+        parentNode.firstElementChild?.firstElementChild?.firstElementChild?.remove();
+
+        // const title = await this.createTitle(currentPage);
+        const carCount = await this.controller.getCarsCount();
+        const title = this.getHTMLElement('h2', 'tracks-title_text');
+        title.innerText = `Garage contains ${carCount} cars. Box: ${currentPage}.`;
+
+        // console.log(
+        //     '# parentNode.firstElementChild?.firstElementChild? = ',
+        //     parentNode.firstElementChild?.firstElementChild
+        // );
+
+        parentNode.firstElementChild?.firstElementChild?.append(title);
+    }
+
+    async rerenderTracks(parentNode: Element, currentPage: number) {
+        if (currentPage !== 0) {
+            await this.getCars(currentPage);
+            this.element.outerHTML = '';
+            this.element = this.getContainer();
+            this.init(parentNode);
+        }
     }
 
     async init(parentNode: Element) {
         this.element.innerHTML = '';
+        const currentPage = await this.controller.getCarsCurrentPage();
 
-        const carCount = await this.controller.getCarsCount();
-        const carPage = await this.controller.getCarsCurrentPage();
-        console.log('## TRacks init()', carPage);
-        const title = this.getTitle(`Garage contains ${carCount} cars. Box: ${carPage}.`);
+        const title = await this.createTitle(currentPage);
         this.element.append(title);
 
-        const carsPromise = await this.getCars(await this.getCarsCurrentPage());
-        const cars = carsPromise as CarsData;
+        const cars = await this.getCars(currentPage);
+        const trackElements = this.createTrackElements(cars as CarsData);
 
-        const trackElements = this.createTrackElements(cars);
         this.renderCars(trackElements);
 
         parentNode.append(this.element);
@@ -90,25 +120,6 @@ class Tracks {
         return trackElements;
     }
 
-    async rerender(parentNode: Element, currentPage: number) {
-        // const currentPage = await this.getCarsCurrentPage();
-        // const count: number = await this.controller.getCarsCount();
-
-        // console.log(
-        //     '^ rerender:  = currentPage, Math.ceil(count / 7), count => ',
-        //     currentPage,
-        //     Math.ceil(count / 7),
-        //     count
-        // );
-        // && currentPage < Math.ceil(count / 7)
-        if (currentPage !== 0) {
-            await this.getCars(currentPage);
-            this.element.outerHTML = '';
-            this.element = this.getContainer();
-            this.init(parentNode);
-        }
-    }
-
     // clear() {
     //     this.element.outerHTML = '';
     // }
@@ -137,3 +148,23 @@ class Tracks {
 }
 
 export default Tracks;
+
+// subscribeGarageElements(garageElements: GarageElements) {
+//     const { tracksElement } = garageElements;
+//     const updateTracksSubscriber = async (currenrPage: number) => {
+//         const parent = tracksElement.element.parentElement;
+//         console.log('$$$ currenrPage =', currenrPage);
+//         if (parent) {
+//             await tracksElement.rerender(parent, currenrPage);
+//         }
+//     };
+//     // const { header, main } = viewElements;
+//     const callbacks = [updateTracksSubscriber];
+
+//     callbacks.forEach((callback) => tracksElement.controller.subscribe(callback));
+// }
+
+// setRerenderCallback(cb: CBfunc) {
+//     // console.log('cb = ', cb);
+//     this.rerenderCallback = cb;
+// }

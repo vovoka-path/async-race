@@ -1,3 +1,4 @@
+import model from './get-model';
 import Model from '../model/model';
 import Observer from './observer';
 import { SubmitMethodList, NameFunction, CallbaclFunction } from '../types/types';
@@ -25,18 +26,19 @@ class ButtonController extends Observer {
         super();
         this.name = buttonName;
         this.id = id ? id : '';
-        this.model = new Model();
+        this.model = model;
+        // this.model = new Model();
         // this.callback = () => 1 + 2;
         const submitMethods: SubmitMethodList = {
             // garage: (buttonName: string) => this.model.garage(buttonName),
             // winners: (buttonName: string) => this.model.winners(buttonName),
-            // race: (buttonName: string) => this.model.race(buttonName),
-            // reset: (buttonName: string) => this.model.reset(buttonName),
+            race: () => this.model.race(),
+            reset: () => this.model.reset(),
             generate: () => this.model.generate100Cars(),
             prev: () => this.model.prev(),
             next: () => this.model.next(),
-            // start: (buttonName: string, id?: string) => this.model.start(buttonName, id),
-            // stop: (buttonName: string, id?: string) => this.model.stop(buttonName, id),
+            start: (id: string) => this.model.startCarEngine(id),
+            stop: (id: string) => this.model.stop(id),
             // edit: (buttonName: string, id?: string) => this.model.edit(buttonName, id),
             delete: (id: string) => this.model.delete(id),
         };

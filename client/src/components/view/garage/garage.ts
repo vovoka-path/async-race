@@ -1,6 +1,8 @@
 import Button from '../button/button';
 import Form from '../form/form';
 import Tracks from '../tracks/tracks';
+import GarageController from '../../controller/garage-controller';
+import model from '../../controller/get-model';
 // import Api from '../../model/api';
 // import Track from '../track/track';
 import {
@@ -11,18 +13,21 @@ import {
     TypesOfElement,
     Elements,
     // ObserverFunction,
-    CBfunc,
+    // CBfunc,
+    GarageElements,
 } from '../../types/types';
 
 // type ElementClass = typeof Button | typeof Form;
 
 class Garage {
+    controller = new GarageController();
     // parent: HTMLElement;
     garage: HTMLElement;
     inputFormElements: Elements;
     buttonElements: Elements;
     tracksElement: Tracks;
     panginationElements: Elements;
+    model = model;
     constructor() {
         this.garage = this.getHTMLElement('div', 'garage');
         this.inputFormElements = {};
@@ -37,7 +42,10 @@ class Garage {
         // this.renderTestOutpuElement();
         this.renderPangination();
         await this.renderTracks();
-        this.subscribeEvents();
+        // this.subscribeEvents();
+        this.subscribeGarageElements(this.getAllGarageElements());
+
+        // console.log('this.element.title = ', this.renderTracks);
 
         parentElement.append(this.garage);
     }
@@ -63,11 +71,8 @@ class Garage {
     // # Render 7 tracks / 1 page
     private async renderTracks() {
         const container = this.createContainer('tracks');
-
-        const tracks = this.tracksElement;
-        await tracks.init(container);
-        // this.garage.append
-
+        // const tracks = this.tracksElement;
+        await this.tracksElement.init(container);
         // console.log('# GARAGE: container = ', container);
         // console.log('# GARAGE: this.trackElement.trackElements = ', this.tracksElement.trackElements);
         // console.log('# GARAGE: this.trackElement.trackElements[1] = ', this.tracksElement.trackElements[1]);
@@ -77,31 +82,104 @@ class Garage {
     private renderPangination() {
         const container = this.createContainer('pangination');
 
-        ['prev', 'next'].forEach((name) => {
+        ['prev', 'next'].forEach(async (name) => {
             this.panginationElements[name] = this.renderChildElement(name as ButtonName, Button, container);
+            const currentPage = await model.getCarsPageFromLocalStorage();
+            const isLastCarsPage = await model.isLastCarsPage(currentPage);
+            if (name === 'prev' && currentPage === 1) {
+                (this.panginationElements[name] as Button).toggleActive();
+            } else if (name === 'next' && isLastCarsPage) {
+                (this.panginationElements[name] as Button).toggleActive();
+            }
         });
     }
 
-    subscribeEvents() {
-        const updateTracksSubscriber = async (currenrPage: number) => {
-            const parent = this.tracksElement.element.parentElement;
-            console.log('$$$ currenrPage =', currenrPage);
+    getAllGarageElements() {
+        return {
+            inputFormElements: this.inputFormElements,
+            buttonElements: this.buttonElements,
+            tracksElement: this.tracksElement,
+            panginationElements: this.panginationElements,
+        } as GarageElements;
+    }
+
+    // subscribeGarageElements1() {
+    //     // this.tracksElement.subscribeGarageElements({
+    //     this.subscribeGarageElements2({
+    //         inputFormElements: this.inputFormElements,
+    //         buttonElements: this.buttonElements,
+    //         tracksElement: this.tracksElement,
+    //         panginationElements: this.panginationElements,
+    //     } as GarageElements);
+    // }
+
+    subscribeGarageElements(garageElements: GarageElements) {
+        const { tracksElement } = garageElements;
+
+        // const getGarageElements = () => {
+        //     return garageElements;
+        // };
+
+        // const updateTrack = async (id: number) => {
+        //     // console.log('$$$ currenrPage =', currenrPage);
+        //     if (id) {
+        //         await tracksElement.trackElements rerenderTrack(id);
+        //     }
+        // };
+
+        const updateTracks = async (currenrPage: number) => {
+            const parent = tracksElement.element.parentElement;
+            // console.log('$$$ currenrPage =', currenrPage);
             if (parent) {
-                await this.tracksElement.rerender(parent, currenrPage);
+                await tracksElement.rerenderTracks(parent, currenrPage);
             }
         };
 
-        // this.tracksElement.rerenderCallback(updateTracksSubscriber as CBfunc);
-        this.inputFormElements.create.controller.model.setRerenderCallback(updateTracksSubscriber as CBfunc);
-        this.tracksElement.controller.model.setRerenderCallback(updateTracksSubscriber as CBfunc);
-        // console.log('this.panginationElements.prev.controller.submit =');
-        this.buttonElements.generate.controller.model.setRerenderCallback(updateTracksSubscriber as CBfunc);
-        this.panginationElements.prev.controller.model.setRerenderCallback(updateTracksSubscriber as CBfunc);
-        this.panginationElements.next.controller.model.setRerenderCallback(updateTracksSubscriber as CBfunc);
+        const updateTracksTitle = async (currenrPage: number) => {
+            const parent = tracksElement.element.parentElement;
+            // console.log('$$$ currenrPage =', currenrPage);
+            if (parent) {
+                await tracksElement.rerenderTracksTitle(parent, currenrPage);
+            }
+        };
 
-        // this.panginationElements.prev.controller.subscribe(updateTracksSubscriber as ObserverFunction);
-        // this.panginationElements.next.controller.subscribe(updateTracksSubscriber as ObserverFunction);
+        // const { header, main } = viewElements;
+        // const callbacks = [updateTracks, updateTracksTitle];
+
+        // callbacks.forEach((callback) => {
+        this.model.setRerenderTracks(updateTracks);
+        this.model.setRerenderTracksTitle(updateTracksTitle);
+        // this.model.setGarageElements(getGarageElements);
+        // this.panginationElements.prev.controller.subscribe(callback);
+        // this.panginationElements.next.controller.subscribe(callback);
+        // this.buttonElements.generate.controller.subscribe(callback);
+        // this.inputFormElements.create.controller.subscribe(callback);
+        // this.tracksElement.controller.subscribe(callback);
+        // });
+
+        // this.tracksElement.
     }
+
+    // subscribeEvents() {
+    //     const updateTracksSubscriber = async (currenrPage: number) => {
+    //         const parent = this.tracksElement.element.parentElement;
+    //         console.log('$$$ currenrPage =', currenrPage);
+    //         if (parent) {
+    //             await this.tracksElement.rerender(parent, currenrPage);
+    //         }
+    //     };
+
+    //     // this.tracksElement.rerenderCallback(updateTracksSubscriber as CBfunc);
+    //     this.inputFormElements.create.controller.model.setRerenderCallback(updateTracksSubscriber as CBfunc);
+    //     this.tracksElement.controller.model.setRerenderCallback(updateTracksSubscriber as CBfunc);
+    //     // console.log('this.panginationElements.prev.controller.submit =');
+    //     this.buttonElements.generate.controller.model.setRerenderCallback(updateTracksSubscriber as CBfunc);
+    //     this.panginationElements.prev.controller.model.setRerenderCallback(updateTracksSubscriber as CBfunc);
+    //     this.panginationElements.next.controller.model.setRerenderCallback(updateTracksSubscriber as CBfunc);
+
+    //     // this.panginationElements.prev.controller.subscribe(updateTracksSubscriber as ObserverFunction);
+    //     // this.panginationElements.next.controller.subscribe(updateTracksSubscriber as ObserverFunction);
+    // }
 
     private renderChildElement(name: ElementName, elementClass: TypesOfElement, parentNode: Element) {
         const element = new elementClass(name);
@@ -159,3 +237,13 @@ class Garage {
 }
 
 export default Garage;
+// function GarageElements(arg0: { inputFormElements: Elements; buttonElements: Elements; tracksElement: Tracks; panginationElements: Elements; }) {
+//     throw new Error('Function not implemented.');
+// }
+
+// private setListeners(element: HTMLElement, name: string) {
+//     element.onclick = () => {
+//         element.controller.submit(name);
+//         this.controller.broadcast(name);
+//     };
+// }

@@ -1,5 +1,5 @@
-import { Paths } from '../types/types';
-import { CarData, CarsData } from '../types/types';
+import { CarEngine, Paths } from '../types/types';
+import { CarData } from '../types/types';
 
 class Api {
     serverUrl: string;
@@ -21,7 +21,7 @@ class Api {
         return data?.count;
     }
 
-    async getCars(page: number): Promise<CarsData | null> {
+    async getCars(page: number) {
         try {
             const response = await fetch(`${this.paths.garage}?_page=${page}&_limit=${this.carsOnPage}`);
 
@@ -34,7 +34,7 @@ class Api {
 
             return null;
         } catch (error) {
-            throw new Error(error as string | undefined);
+            // throw new Error(error as string | undefined);
         }
     }
 
@@ -55,12 +55,12 @@ class Api {
                 console.log('Unsuccess: car was not created... Code: 500');
             }
         } catch (error) {
-            throw new Error(error as string | undefined);
+            // throw new Error(error as string | undefined);
         }
     }
 
     async updateCar(carData: CarData) {
-        console.log('# updateCar: carData =', carData);
+        // console.log('# updateCar: carData =', carData);
         const id: number = carData.id || 0;
         const body = {
             name: carData.name,
@@ -78,12 +78,12 @@ class Api {
 
             if (response.status === 200) {
                 console.log('Success: car was updated! Code: 200');
-                console.log('response.json() =', response.json());
+                // console.log('response.json() =', response.json());
             } else if (response.status === 404) {
                 console.log('Unsuccess: car was not updated... Code: 404');
             }
         } catch (error) {
-            throw new Error(error as string | undefined);
+            // throw new Error(error as string | undefined);
         }
     }
 
@@ -99,7 +99,55 @@ class Api {
                 console.log('Unsuccess: car was not deleted... Code: 500 ');
             }
         } catch (error) {
-            throw new Error(error as string | undefined);
+            // throw new Error(error as string | undefined);
+        }
+    }
+
+    async startEngineCar(id: number) {
+        try {
+            const data = await fetch(`${this.paths.engine}/?id=${id}&status=started`, {
+                method: 'PATCH',
+            });
+            const res: CarEngine = await data.json();
+            // console.log('# startEngineCar res = ', res);
+
+            return {
+                status: data.status,
+                result: res,
+            };
+        } catch (err) {
+            //   throw new Error(err);
+        }
+    }
+
+    async getEngineCondition(id: number): Promise<{ success: boolean }> {
+        try {
+            const data = await fetch(`${this.paths.engine}/?id=${id}&status=drive`, {
+                method: 'PATCH',
+            }); //.catch();
+            // const res = await data.json();
+            // console.log('# getEngineCondition res.status = ', res.status);
+
+            return data.status !== 200 ? { success: false } : { success: true };
+        } catch (err) {
+            //   throw new Error(err);
+            return { success: false };
+        }
+    }
+
+    async stopEngineCar(id: number) {
+        try {
+            const data = await fetch(`${this.paths.engine}/?id=${id}&status=stopped`, {
+                method: 'PATCH',
+            });
+            const res: CarEngine = await data.json();
+            // console.log('# stopEngineCar res = ', res);
+            return {
+                status: data.status,
+                result: res,
+            };
+        } catch (err) {
+            //   throw new Error(err);
         }
     }
 }

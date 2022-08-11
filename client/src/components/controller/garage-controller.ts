@@ -2,22 +2,16 @@ import model from './get-model';
 import Model from '../model/model';
 import Api from '../model/api';
 import { CarData } from '../types/types';
-// import { CarsData, CarData } from '../../types/types';
-// import Observer from './observer';
-// import { FormData } from '../types/types';
+import Observer from './observer';
 
-class TrackController {
+class GarageController extends Observer {
     // name: string;
     model: Model;
     api: Api;
-    // Coming: 'create' or 'update'
     constructor() {
+        super();
         this.model = model;
         this.api = new Api();
-        // this.modelInputMethod = this.assignInputMethodByName(formName);
-        // this.modelSubmitMethod = this.assignSubmitMethodByName(formName);
-        // console.log('this.modelInputMethod', this.modelInputMethod);
-        // this.assignMethodsByName(this.name);
     }
 
     async getCarsCurrentPage() {
@@ -41,4 +35,4 @@ class TrackController {
     }
 }
 
-export default TrackController;
+export default GarageController;

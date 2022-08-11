@@ -1,5 +1,8 @@
 import Button from '../view/button/button';
 import Form from '../view/form/form';
+import Header from '../view/header/header';
+import Main from '../view/main/main';
+import Tracks from '../view/tracks/tracks';
 
 export interface CarsData {
     count: string | null;
@@ -79,3 +82,49 @@ export interface VendorCars {
 }
 
 // export type ElementClass = typeof Button | typeof Form;
+
+export interface HeaderData {
+    elementName: string;
+    titleText: string;
+    pages: string[];
+}
+
+export interface NavMenuElements {
+    containerNavMenu: HTMLElement;
+    pageElements: HTMLElement[];
+}
+
+export type CbData = string | number | CarData | HTMLElement;
+// export type CallbackType<T> = ((pageName: T) => void) | (() => void);
+type CallbackType1<T> = (pageName: T) => void;
+type CallbackType2 = () => void;
+export type CallbackType3<T> = () => T;
+export type CallbackType<T> = CallbackType1<T> | CallbackType2 | CallbackType3<T>;
+// export type CallbackType = (pageName: string) => void | (() => void);
+// export type CallbackTypes = CallbackType[];
+
+export interface ViewElements {
+    header: Header;
+    main: Main;
+    // parent: HTMLElement;
+}
+
+// export interface FuncData {
+//     [key: string]: string | number;
+// }
+
+// export type NameOrId<T extends number | string > = T extends number
+// ? IdLabel
+// : NameLabel;
+
+export interface GarageElements {
+    inputFormElements: Elements;
+    buttonElements: Elements;
+    tracksElement: Tracks;
+    panginationElements: Elements;
+}
+
+export interface CarEngine {
+    velocity: number;
+    distance: number;
+}

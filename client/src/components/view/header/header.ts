@@ -31,7 +31,7 @@ class Header {
         this.pageElements.forEach(
             (item) =>
                 (item.onclick = () => {
-                    this.controller.setPageName(item.innerText);
+                    this.controller.click(item.innerText);
                     this.controller.broadcast(item.innerText);
                 })
         );
@@ -72,10 +72,10 @@ class Header {
     showBanner() {
         const banner = createHTMLElement('div', 'header-banner');
         banner.innerHTML = `
-        <div style="display: flex; justify-content: center; color: white; background: green; min-height: 160px;">
+        <div style="display: flex; justify-content: center; color: white; background: green; min-height: 200px;">
 	        <div style="margin: auto 0; font-size: 22px; text-align: center;">
-		        Пожалуйста, <span style="font-weight: 700; font-size: 26px;">проверьте мою работу в четверг после 17:00 (МСК)</span>, если это возможно. <br>
-		        Дело движется к завершению. Сделаю все, чтобы в четверг вам проверять было легко. <br>Огромное спасибо вам за то, идете навстречу с этим непростым таском!
+		        <span style="font-weight: 700; font-size: 26px;">Спасибо огромное за то, что пошли навстречу!</span><br>
+		        К сожаление, я не успел все сделать. Простите меня... Winners не сделано.
 	        </div>
         </div>
         `;

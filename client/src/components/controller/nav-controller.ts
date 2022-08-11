@@ -1,15 +1,22 @@
+import model from './get-model';
+// import Model from '../model/model';
 import Observer from './observer';
-import Model from '../model/model';
 
 class NavController extends Observer {
-    model: Model;
+    // private pageName: string;
+    private model = model;
     constructor() {
         super();
-        this.model = new Model();
+        // this.pageName = this.model.getPage();
     }
 
     click(name: string) {
-        this.model.setPage(name);
+        // this.pageName = name;
+        this.model.setPageName(name);
+    }
+
+    getPageName() {
+        return this.model.getPageName();
     }
 }
 
