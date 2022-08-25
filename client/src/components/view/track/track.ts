@@ -1,22 +1,17 @@
-// import TrackController from '../../controller/button-controller';
 import Button from '../button/button';
 import Form from '../form/form';
 import Cars from './cars';
-// import TrackButton from '../button/track-button';
 import { CarData } from '../../types/types';
 
-const carImageWidth = '75px';
+const CAR_IMAGE_WIDTH = '75px';
 
 class Track {
     carData: CarData;
     name: string;
     color: string;
-    id: string; // | undefined
-    // controller: TrackController;
-    // element: Element;
+    id: string;
     startButton: Button;
     stopButton: Button;
-    // editButton: Button;
     deleteButton: Button;
     updateForm: Form;
     carImage: Cars;
@@ -28,14 +23,8 @@ class Track {
         this.name = name;
         this.color = color;
         this.id = (id as number).toString();
-        // console.log('$ Track constructor: data =', this.name, this.color, this.id);
-        // this.controller = new TrackController(name);
-        // this.element = this.getHTMLButtonContainer();
-        // this.element = this.getHTMLButtonContainer();
-
         this.startButton = new Button('start', this.id);
         this.stopButton = new Button('stop', this.id);
-        // this.editButton = new Button('edit', this.id);
         this.deleteButton = new Button('delete', this.id);
         this.updateForm = new Form('update', this.id);
         this.carImage = new Cars();
@@ -43,14 +32,15 @@ class Track {
     }
 
     animationCar(time: number): void {
-        this.carAnimation = this.car.animate([{ left: '75px' }, { left: `calc(100% - ${carImageWidth}px)` }], {
+        this.carAnimation = this.car.animate([{ left: '75px' }, { left: `calc(100% - ${CAR_IMAGE_WIDTH}px)` }], {
             duration: time,
             easing: 'ease-in-out',
         });
+
         if (this.carAnimation) {
             this.carAnimation.play();
             this.carAnimation.onfinish = () => {
-                this.car.style.left = `calc(100% - ${carImageWidth}px)`;
+                this.car.style.left = `calc(100% - ${CAR_IMAGE_WIDTH}px)`;
             };
         }
     }
@@ -64,7 +54,6 @@ class Track {
         trackContainer.append(this.getCarButtons());
         trackContainer.append(this.getRaceContainer());
         trackContainer.append(this.getRoadContainer());
-        // parentNode.append(trackContainer);
 
         return trackContainer;
     }
@@ -102,7 +91,6 @@ class Track {
 
         this.startButton.init(buttonContainer);
         this.stopButton.init(buttonContainer);
-        // this.editButton.init(buttonContainer);
         this.deleteButton.init(buttonContainer);
         this.updateForm.init(buttonContainer);
 
@@ -111,13 +99,11 @@ class Track {
 
     private getRoadContainer() {
         const container = this.getHTMLElement('div', 'container-road');
-        // const topLine = this.getLine();
         const bottomLine = this.getLine();
 
         const svgContainer = this.getHTMLElement('div', 'container-svg');
         svgContainer.append(this.getCar());
 
-        // container.append(topLine);
         container.append(svgContainer);
         container.append(bottomLine);
 
@@ -147,13 +133,3 @@ class Track {
 }
 
 export default Track;
-
-// render(parentNode: Element) {
-//     const trackContainer = document.createElement('div');
-//     trackContainer.className = 'track-container';
-//     trackContainer.setAttribute('id', (this.id as number).toString());
-
-//     trackContainer.append(this.getHTMLButtonContainer());
-//     trackContainer.append(this.getHTMLCar());
-//     parentNode.append(trackContainer);
-// }
