@@ -17,7 +17,6 @@ class Api {
 
     async getCarsCount() {
         const data = await this.getCars(0);
-        // console.log('data = ', data?.count);
         return data?.count;
     }
 
@@ -34,12 +33,11 @@ class Api {
 
             return null;
         } catch (error) {
-            // throw new Error(error as string | undefined);
+            throw new Error(error as string | undefined);
         }
     }
 
-    async createCar(carData: CarData) {
-        // console.log('# createCar: carData =', carData);
+    async createCar(carData: CarData): Promise<void> {
         try {
             const response = await fetch(`${this.paths.garage}`, {
                 method: 'POST',
@@ -55,12 +53,11 @@ class Api {
                 console.log('Unsuccess: car was not created... Code: 500');
             }
         } catch (error) {
-            // throw new Error(error as string | undefined);
+            throw new Error(error as string | undefined);
         }
     }
 
-    async updateCar(carData: CarData) {
-        // console.log('# updateCar: carData =', carData);
+    async updateCar(carData: CarData): Promise<void> {
         const id: number = carData.id || 0;
         const body = {
             name: carData.name,
@@ -78,16 +75,15 @@ class Api {
 
             if (response.status === 200) {
                 console.log('Success: car was updated! Code: 200');
-                // console.log('response.json() =', response.json());
             } else if (response.status === 404) {
                 console.log('Unsuccess: car was not updated... Code: 404');
             }
         } catch (error) {
-            // throw new Error(error as string | undefined);
+            throw new Error(error as string | undefined);
         }
     }
 
-    async deleteCar(id: number) {
+    async deleteCar(id: number): Promise<void> {
         try {
             const response = await fetch(`${this.paths.garage}/${id}`, {
                 method: 'DELETE',
@@ -99,24 +95,23 @@ class Api {
                 console.log('Unsuccess: car was not deleted... Code: 500 ');
             }
         } catch (error) {
-            // throw new Error(error as string | undefined);
+            throw new Error(error as string | undefined);
         }
     }
 
-    async startEngineCar(id: number) {
+    async startEngineCar(id: number): Promise<{ status: number, result: CarEngine }> {
         try {
             const data = await fetch(`${this.paths.engine}/?id=${id}&status=started`, {
                 method: 'PATCH',
             });
             const res: CarEngine = await data.json();
-            // console.log('# startEngineCar res = ', res);
 
             return {
                 status: data.status,
                 result: res,
             };
-        } catch (err) {
-            //   throw new Error(err);
+        } catch (error) {
+            throw new Error(error as string | undefined);
         }
     }
 
@@ -124,30 +119,28 @@ class Api {
         try {
             const data = await fetch(`${this.paths.engine}/?id=${id}&status=drive`, {
                 method: 'PATCH',
-            }); //.catch();
-            // const res = await data.json();
-            // console.log('# getEngineCondition res.status = ', res.status);
+            });
 
             return data.status !== 200 ? { success: false } : { success: true };
-        } catch (err) {
-            //   throw new Error(err);
-            return { success: false };
+        } catch (error) {
+            return { 
+                success: false,
+            };
         }
     }
 
-    async stopEngineCar(id: number) {
+    async stopEngineCar(id: number): Promise<{ status: number, result: CarEngine }> {
         try {
             const data = await fetch(`${this.paths.engine}/?id=${id}&status=stopped`, {
                 method: 'PATCH',
             });
             const res: CarEngine = await data.json();
-            // console.log('# stopEngineCar res = ', res);
             return {
                 status: data.status,
                 result: res,
             };
-        } catch (err) {
-            //   throw new Error(err);
+        } catch (error) {
+            throw new Error(error as string | undefined);
         }
     }
 }
