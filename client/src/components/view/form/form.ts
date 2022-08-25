@@ -1,13 +1,5 @@
-// import styles from './form-input-styles.scss';
 import FormController from '../../controller/form-controller';
 import { FormsData, CarData, ObserverFunction } from '../../types/types';
-
-// const controller = new ControllerForm();
-
-// const actiosMethods: MethodList = {
-//     'create': controller.setInputCreate,
-//     'update': controller.setInputUpdate,
-// }
 
 class Form {
     name: string;
@@ -41,51 +33,30 @@ class Form {
     }
 
     init(parentNode: Element) {
-        // if (this.form) this.destroy();
         this.setListeners();
         parentNode.append(this.form);
     }
 
     setCallback(cb: ObserverFunction) {
-        // console.log('cb = ', cb);
-        // this.controller.setCallback(cb);
         this.callback = cb;
     }
 
     setListeners() {
         this.inputText.oninput = () => {
             this.controller.input(this.getData());
-            // this.controller.broadcast(this.getData());
         };
 
         this.inputColor.oninput = () => {
             this.controller.input(this.getData());
-            // this.controller.broadcast(this.getData());
         };
 
         this.button.onclick = () => {
             this.controller.submit(this.getData());
             this.controller.broadcast(this.getData());
         };
-        // const actionMethods: InputMethodList = {
-        //     input: this.controller.input,
-        //     submit: this.controller.submit,
-        // };
-
-        // const callback = (action: string) => {
-        //     return () => {
-        //         actionMethods[action](this.getData());
-        //         this.controller.broadcast(this.getData());
-        //     };
-        // };
-
-        // this.inputText.oninput = callback('input');
-        // this.inputColor.oninput = callback('input');
-        // this.button.onclick = callback('submit');
     }
 
     getData() {
-        // console.log('getData() = ', this.inputText.value)
         const data: CarData = {
             name: this.inputText.value,
             color: this.inputColor.value,
@@ -97,22 +68,12 @@ class Form {
 
     setData(data: CarData) {
         this.data = { ...this.data, ...data };
-        // console.log('setData() this.data = ', this.data)
         this.inputText.value = this.data.name;
         this.inputColor.value = this.data.color;
         this.button.textContent = this.name;
-        // console.log('setData() this.data.input = ', this.data.input)
-        // console.log('setData() this.inputText.value = ', this.inputText.value)
     }
 
     getFormDataFromStorage() {
-        // console.log(
-        //     'name =',
-        //     name,
-        //     'this.controller.getFormDataFromStorage() as FormData = ',
-        //     this.controller.getFormDataFromStorage() as FormsData
-        // );
-
         return this.controller.getFormDataFromStorage() as FormsData;
     }
 
