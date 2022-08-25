@@ -1,4 +1,3 @@
-// import Model from '../../model/model';
 import NavController from '../../controller/nav-controller';
 import Garage from '../garage/garage';
 import Winners from '../winners/winners';
@@ -16,13 +15,17 @@ class Main {
 
     render() {
         this.clear();
-
         this.pageName = this.navController.getPageName();
 
-        if (this.pageName.toLowerCase() === 'garage') {
-            this.garage.render(this.main);
-        } else if (this.pageName.toLowerCase() === 'winners') {
-            this.winners.render(this.main);
+        const currentPage = this.pageName.toLowerCase();
+
+        switch (currentPage) {
+            case 'garage':
+                this.garage.render(this.main);
+                break;
+            case 'winners':
+                this.winners.render(this.main);
+                break;
         }
 
         document.body.append(this.main);
@@ -42,11 +45,3 @@ class Main {
 }
 
 export default Main;
-
-// getPageName() {
-//     return this.model.getPage();
-// }
-
-// setPageName(pageName: string) {
-//     this.pageName = pageName;
-// }
