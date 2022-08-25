@@ -1,5 +1,4 @@
 import NavController from '../../controller/nav-controller';
-// import { Data, MethodList } from '../../types/types';
 
 class Footer {
     controller: NavController;
