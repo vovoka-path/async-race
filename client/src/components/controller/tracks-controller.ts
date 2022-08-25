@@ -5,7 +5,6 @@ import { CarData } from '../types/types';
 import Observer from './observer';
 
 class TracksController extends Observer {
-    // name: string;
     model: Model;
     api: Api;
     constructor() {
@@ -20,7 +19,6 @@ class TracksController extends Observer {
 
     async getCarsCount() {
         const count = await this.model.getCarsCount();
-        // console.log('# TRACK contr: getCarsCount() = ', count);
 
         return count;
     }
