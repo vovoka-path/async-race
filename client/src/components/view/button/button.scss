@@ -26,11 +26,6 @@
     background-color: $primaryLight;
 }
 
-// .button:hover:disabled {
-//     background-color: $primaryLighter;
-//     box-shadow: 0;
-// }
-
 .button:active {
     transform: scale(0.97);
 	transition: 0.1s;

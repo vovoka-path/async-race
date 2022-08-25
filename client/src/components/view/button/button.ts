@@ -1,7 +1,6 @@
 import ButtonController from '../../controller/button-controller';
 import Observer from '../../controller/observer';
 import { ObserverFunction } from '../../types/types';
-// import { Data } from '../../types/types';
 
 class Button extends Observer {
     name: string;
@@ -24,8 +23,6 @@ class Button extends Observer {
     }
 
     setCallback(cb: ObserverFunction) {
-        // console.log('cb = ', cb);
-        // this.controller.setCallback(cb);
         this.callback = cb;
     }
 
@@ -36,7 +33,7 @@ class Button extends Observer {
 
     private setListeners() {
         this.button.onclick = () => {
-            this.controller.submit(this.name);
+            this.controller.submit();
             this.controller.broadcast(this.name);
         };
     }
