@@ -7,7 +7,7 @@ const CAR_IMAGE_WIDTH = '75px';
 
 class Track {
     carData: CarData;
-    name: string;
+    name: string | undefined;
     color: string;
     id: string;
     startButton: Button;

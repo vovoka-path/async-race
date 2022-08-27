@@ -1,47 +1,38 @@
-import { FormsData, CarData, VendorCars, CBfunc, CallbackType, GarageElements } from '../types/types'; // Car
+import { FormsData, CarData, VendorCars, CBfunc, CallbackType, GarageElements, State } from '../types/types';
+import { getRandomColor } from '../utils/utils';
 import Api from './api';
 import Cars from '../view/track/cars';
 
 const INDEXPAGE = 'garage';
 const GENERATE_NUMBER_CARS = 100;
+const CARS_PER_PAGE = 7;
 const btnIsActive = {
     yes: true,
     no: false,
 }
+const defaultCarData = { text: '', color: '#000000' };
 
 class Model {
     formsData: FormsData;
-    inputCreateData: CarData;
-    inputUpdateData: CarData;
-    pageName: string;
-    api: Api;
-    carCount: number;
+    inputCreateData: CarData = defaultCarData;
+    inputUpdateData: CarData = defaultCarData;
+    pageName: string = INDEXPAGE;
+    api: Api = new Api();
+    carCount = 5;
     lastCarId: number;
-    rerenderTrack: CBfunc;
-    rerenderTracks: CBfunc;
-    rerenderTracksTitle: CBfunc;
-    cbs: CallbackType<GarageElements>[];
+    rerenderTrack: CBfunc = () => null;
+    rerenderTracks: CBfunc = () => null;
+    rerenderTracksTitle: CBfunc = () => null;
+    cbs: CallbackType<GarageElements>[] = [];
     buttons: HTMLCollectionOf<HTMLButtonElement>;
     carAnimation: Animation | undefined;
-    carImage: Cars;
-    isStop: { [key: string]: boolean };
-    timeRace: { [key: string]: boolean };
+    carImage = new Cars();
+    isStop: { [key: string]: boolean } = {};
+    timeRace: { [key: string]: boolean } = {};
     constructor() {
-        this.api = new Api();
-        this.carCount = 5;
         this.lastCarId = this.carCount;
         this.formsData = this.getFormsDataFromLocalStorage();
-        this.inputCreateData = { name: '', color: '#000000' };
-        this.inputUpdateData = { name: '', color: '#000000' };
-        this.pageName = INDEXPAGE;
-        this.cbs = [];
-        this.rerenderTrack = () => null;
-        this.rerenderTracks = () => null;
-        this.rerenderTracksTitle = () => null;
         this.buttons = this.getButtons();
-        this.carImage = new Cars();
-        this.isStop = {};
-        this.timeRace = {};
     }
 
     async race() {
@@ -58,14 +49,14 @@ class Model {
     }
 
     async stop(id: string) {
-        const id_ = +id;
-        const res = await this.api.stopEngineCar(id_);
+        const carId = +id;
+        const res = await this.api.stopEngineCar(carId);
 
         if (res?.result) {
             window.cancelAnimationFrame(res?.result.velocity);
         }
 
-        this.isStop = { ...this.isStop, [id_]: true };
+        this.isStop = { ...this.isStop, [carId]: true };
     }
 
     async startCarEngine(id: string): Promise<void> {
@@ -79,9 +70,9 @@ class Model {
         this.toggleButton(startButton as HTMLButtonElement, btnIsActive.no);
         this.toggleButton(stopButton as HTMLButtonElement, btnIsActive.yes);
 
-        const id_ = +id;
-        const start = await this.api.startEngineCar(id_);
-        this.isStop = { ...this.isStop, [id_]: false };
+        const carId = +id;
+        const start = await this.api.startEngineCar(carId);
+        this.isStop = { ...this.isStop, [carId]: false };
 
         if (start) {
             this.buttons.namedItem('start')?.classList.remove('not-active');
@@ -89,19 +80,21 @@ class Model {
             const { velocity, distance } = result;
             const animationTime = Math.round(distance / velocity);
             const screenWidth = document.documentElement.scrollWidth;
-            const raceTime = Math.round(animationTime / 10) / 100;
-            this.timeRace = { ...this.timeRace, [id_]: raceTime };
+            const milliSecInSec = 1000;
+            const raceTime = (animationTime / milliSecInSec).toFixed(2);
+            this.timeRace = { ...this.timeRace, [carId]: raceTime };
 
             setTimeout(() => {
                 this.toggleButton(startButton as HTMLButtonElement, btnIsActive.yes);
                 this.toggleButton(stopButton as HTMLButtonElement, btnIsActive.no);
             }, animationTime);
 
-            const roadLength = screenWidth - 80;
+            const margin = 80;
+            const roadLength = screenWidth - margin;
 
             const car = document.getElementById(`car-${id}`) as HTMLElement;
             if (status === 200) {
-                this.animation(car, roadLength, animationTime, id_);
+                this.animation(car, roadLength, animationTime, carId);
             }
         }
     }
@@ -124,9 +117,7 @@ class Model {
 
     async animation(car: HTMLElement, roadLength: number, animationTime: number, id: number) {
         let start: number | null = null;
-        const state: {
-            id: number;
-        } = { id: 1 };
+        const state = { id: 1 };
 
         const getStep = (timestamp: number) => {
             if (!start) start = timestamp;
@@ -144,7 +135,13 @@ class Model {
             }
         };
 
-        (async () => {
+        this.checkEngineCondition(id, state);
+
+        state.id = window.requestAnimationFrame(getStep);
+    }
+
+    checkEngineCondition(id: number, state: State) {
+        return async () => {
             const { success } = await this.api.getEngineCondition(id);
 
             if (!success) {
@@ -155,6 +152,7 @@ class Model {
                 )
                     .getElementsByTagName('button')
                     .namedItem('start');
+                
                 const stopButton = (
                     document.body.getElementsByClassName('container-track').namedItem(id.toString()) as HTMLElement
                 )
@@ -164,9 +162,7 @@ class Model {
                 this.toggleButton(startButton as HTMLButtonElement, btnIsActive.yes);
                 this.toggleButton(stopButton as HTMLButtonElement, btnIsActive.no);
             }
-        })();
-
-        state.id = window.requestAnimationFrame(getStep);
+        }
     }
 
     getButtons() {
@@ -186,34 +182,25 @@ class Model {
     }
 
     async getCarsCount(): Promise<number> {
-        const temp = await this.api.getCarsCount();
-        const carCount = temp ? +temp : 1;
-
-        return carCount;
+        return await this.api.getCarsCount().then(carCount => carCount ? +carCount : 1)
     }
 
     async getCars(page: number) {
-        const cars = await this.api.getCars(page);
-
-        return cars;
+        return await this.api.getCars(page);
     }
 
     private setFormsDataToLocalStorage(data: FormsData) {
         localStorage.setItem('formsData', JSON.stringify(data));
     }
 
-    private getFormsDataFromLocalStorage() {
-        const formsData = localStorage.getItem('formsData')
+    private getFormsDataFromLocalStorage(): FormsData {
+        return localStorage.getItem('formsData')
             ? JSON.parse(localStorage.getItem('formsData') as string)
             : {
-                  create: { text: '', color: '#000000' },
-                  update: { text: '', color: '#000000' },
-              };
-
-        this.formsData = formsData;
-
-        return formsData as FormsData;
-    }
+                create: defaultCarData,
+                update: defaultCarData,
+            };
+        }
 
     setPageName(name: string) {
         localStorage.setItem('pageNameAsyncRace', name);
@@ -267,7 +254,7 @@ class Model {
 
     async getLastCarsPage() {
         this.carCount = await this.getCarsCount();
-        const pageCount = Math.ceil(this.carCount / 7);
+        const pageCount = Math.ceil(this.carCount / CARS_PER_PAGE);
 
         return pageCount;
     }
@@ -298,18 +285,18 @@ class Model {
         }
     }
 
-    async generate100Cars() {
-        const newCars: VendorCars[] = await this.getNewCars(GENERATE_NUMBER_CARS);
+    async generateCars(carCount = GENERATE_NUMBER_CARS) {
+        const newCars: VendorCars[] = await this.api.getNewCars(carCount);
         let lastCarId = +this.getNextIdFromLocalStorage();
 
         newCars?.forEach((car: VendorCars, i: number) => {
             const name = `${car.Make} ${car.Model}`;
-            const color = this.getRandomColor();
+            const color = getRandomColor();
 
             this.api.createCar({ name: name, color: color, id: lastCarId + i });
         });
 
-        lastCarId += GENERATE_NUMBER_CARS;
+        lastCarId += carCount;
         localStorage.setItem('lastCarId', lastCarId.toString());
 
         const carsPage = await this.getCarsPageFromLocalStorage();
@@ -326,7 +313,7 @@ class Model {
     }
 
     async prev() {
-        const carsPagePrev = +(await this.getCarsPageFromLocalStorage());
+        const carsPagePrev = await this.getCarsPageFromLocalStorage();
 
         if (carsPagePrev !== 1) {
             this.setCarsPageToLocalStorage(carsPagePrev - 1);
@@ -349,7 +336,7 @@ class Model {
     }
 
     async next() {
-        const carsPagePrev = +(await this.getCarsPageFromLocalStorage());
+        const carsPagePrev = await this.getCarsPageFromLocalStorage();
         let isLastCarsPage = await this.isLastCarsPage(carsPagePrev);
 
         if (!isLastCarsPage) {
@@ -394,26 +381,6 @@ class Model {
         car.innerHTML = this.carImage.getSportcar(color);
     }
 
-    private async getNewCars(number: number): Promise<VendorCars[]> {
-        const response = await fetch(`https://parseapi.back4app.com/classes/Car_Model_List?limit=${number}`, {
-            headers: {
-                'X-Parse-Application-Id': 'hlhoNKjOvEhqzcVAJ1lxjicJLZNVv36GdbboZj3Z',
-                'X-Parse-Master-Key': 'SNMJJF0CZZhTPhLDIqGhTlUNV9r60M2Z5spyWfXW',
-            },
-        });
-        const data = await response.json();
-        const newCars: VendorCars[] = data.results ? data.results : [];
-
-        return newCars;
-    }
-
-    private getRandomColor(): string {
-        let hex = (((1 << 24) * Math.random()) | 0).toString(16);
-        if (hex.length < 6) hex = hex + 'f';
-
-        return `#${hex}`;
-    }
-
     reset() {
         const carsPage = +(localStorage.getItem('carsPage') as string);
         this.rerenderTracks(carsPage);
@@ -430,7 +397,7 @@ class Model {
             carsPage = +(localStorage.getItem('carsPage') as string);
 
             const count = await this.getCarsCount();
-            const maxPage = Math.ceil(count / 7);
+            const maxPage = Math.ceil(count / CARS_PER_PAGE);
 
             if (carsPage > maxPage) {
                 carsPage = maxPage;

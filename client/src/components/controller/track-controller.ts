@@ -1,4 +1,3 @@
-import model from './get-model';
 import Model from '../model/model';
 import Api from '../model/api';
 import { CarData } from '../types/types';
@@ -7,7 +6,7 @@ class TrackController {
     model: Model;
     api: Api;
     constructor() {
-        this.model = model;
+        this.model = new Model();
         this.api = new Api();
     }
 
@@ -16,14 +15,11 @@ class TrackController {
     }
 
     async getCarsCount() {
-        const count = await this.model.getCarsCount();
-
-        return count;
+        return await this.model.getCarsCount();
     }
 
     async getCars(pageNumber: number) {
-        const cars = await this.model.getCars(pageNumber);
-        return cars;
+        return await this.model.getCars(pageNumber);
     }
 
     createCar(carData: CarData) {

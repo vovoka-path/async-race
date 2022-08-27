@@ -1,4 +1,3 @@
-import model from './get-model';
 import Model from '../model/model';
 import Observer from './observer';
 import { InputMethodList, GetMethodList, CarData } from '../types/types';
@@ -10,7 +9,7 @@ class FormController extends Observer {
     constructor(formName: string, id?: string) {
         super();
         this.name = formName;
-        this.model = model;
+        this.model = new Model();
         this.id = id ? id : '';
     }
 

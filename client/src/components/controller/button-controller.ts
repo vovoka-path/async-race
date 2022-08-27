@@ -1,4 +1,3 @@
-import model from './get-model';
 import Model from '../model/model';
 import Observer from './observer';
 import { SubmitMethodList, NameFunction, CallbaclFunction } from '../types/types';
@@ -12,11 +11,11 @@ class ButtonController extends Observer {
         super();
         this.name = buttonName;
         this.id = id ? id : '';
-        this.model = model;
+        this.model = new Model;
         const submitMethods: SubmitMethodList = {
             race: () => this.model.race(),
             reset: () => this.model.reset(),
-            generate: () => this.model.generate100Cars(),
+            generate: () => this.model.generateCars(),
             prev: () => this.model.prev(),
             next: () => this.model.next(),
             start: (id: string) => this.model.startCarEngine(id),

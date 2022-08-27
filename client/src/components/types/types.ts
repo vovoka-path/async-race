@@ -9,9 +9,20 @@ export interface CarsData {
     data: CarData[];
 }
 
+// export interface CarData {
+//     name: string;
+//     color: string;
+//     id?: number;
+// }
+
+// export interface DefaultCarData {
+//     text: string;
+//     color: string;
+// }
 export interface CarData {
-    name: string;
     color: string;
+    text?: string;
+    name?: string;
     id?: number;
 }
 
@@ -96,4 +107,8 @@ export interface GarageElements {
 export interface CarEngine {
     velocity: number;
     distance: number;
+}
+
+export interface State {
+    id: number;
 }

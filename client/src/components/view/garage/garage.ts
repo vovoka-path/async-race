@@ -2,7 +2,8 @@ import Button from '../button/button';
 import Form from '../form/form';
 import Tracks from '../tracks/tracks';
 import GarageController from '../../controller/garage-controller';
-import model from '../../controller/get-model';
+// import model from '../../controller/get-model';
+import Model from '../../model/model'
 import {
     FormName,
     ButtonName,
@@ -19,13 +20,14 @@ class Garage {
     buttonElements: Elements;
     tracksElement: Tracks;
     panginationElements: Elements;
-    model = model;
+    model: Model;
     constructor() {
         this.garage = this.getHTMLElement('div', 'garage');
         this.inputFormElements = {};
         this.buttonElements = {};
         this.tracksElement = new Tracks();
         this.panginationElements = {};
+        this.model = new Model();
     }
 
     async render(parentElement: HTMLElement) {
@@ -65,8 +67,8 @@ class Garage {
 
         ['prev', 'next'].forEach(async (name) => {
             this.panginationElements[name] = this.renderChildElement(name as ButtonName, Button, container);
-            const currentPage = await model.getCarsPageFromLocalStorage();
-            const isLastCarsPage = await model.isLastCarsPage(currentPage);
+            const currentPage = await this.model.getCarsPageFromLocalStorage();
+            const isLastCarsPage = await this.model.isLastCarsPage(currentPage);
             
             if (name === 'prev' && currentPage === 1) {
                 (this.panginationElements[name] as Button).toggleActive();

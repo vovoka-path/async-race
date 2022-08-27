@@ -1,8 +1,8 @@
-import model from './get-model';
+import Model from '../model/model';
 import Observer from './observer';
 
 class NavController extends Observer {
-    private model = model;
+    private model = new Model;
     constructor() {
         super();
     }

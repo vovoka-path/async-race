@@ -1,4 +1,3 @@
-import model from './get-model';
 import Model from '../model/model';
 import Api from '../model/api';
 import { CarData } from '../types/types';
@@ -9,7 +8,7 @@ class TracksController extends Observer {
     api: Api;
     constructor() {
         super();
-        this.model = model;
+        this.model = new Model();
         this.api = new Api();
     }
 

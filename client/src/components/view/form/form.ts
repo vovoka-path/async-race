@@ -68,7 +68,7 @@ class Form {
 
     setData(data: CarData) {
         this.data = { ...this.data, ...data };
-        this.inputText.value = this.data.name;
+        this.inputText.value = this.data.name as string;
         this.inputColor.value = this.data.color;
         this.button.textContent = this.name;
     }
