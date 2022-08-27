@@ -1,0 +1,32 @@
+.garage {
+    height: 100%;
+    min-height: calc(100vh - ($header-height + $footer-height) - $main-padding);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.container-setting {
+    margin: 1rem 0;
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+}
+
+.container-forms {
+    margin: 1rem 0;
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+}
+
+.container-tracks {
+    margin: 0.2rem 0.2rem;
+    flex-grow: 1;
+}
+
+.container-pangination {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+}

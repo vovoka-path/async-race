@@ -1,0 +1,39 @@
+.header {
+    height: $header-height;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background-color: $primaryLight;
+}
+
+.header-title-container {
+    display: flex;
+    justify-content: center;
+}
+
+.header-title_text {
+    font-size: 32px;
+    font-weight: 600;
+    color: $primaryDarker;
+}
+
+.header-menu {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    padding: 0;
+}
+
+.header-menu_item {
+    list-style: none;
+    text-transform: capitalize;
+    font-size: 18px;
+    font-weight: 600;
+    color: $secondary;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.header-menu_item:hover {
+    color: $secondaryDarker;
+}

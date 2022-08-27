@@ -1,0 +1,53 @@
+.form {
+    display: flex;
+    justify-content: left;
+    gap: 5px;
+}
+
+.input-text {
+    width: 150px;
+    height: 24px;
+    padding: 0 6px;
+    border: 1px solid $primaryLighter;
+    border-radius: 5px;
+    font-size: 12px;
+    font-weight: 600;
+    color: $primaryLight;
+    background-color: $primaryLighter;
+    box-shadow: 1px 1px -20px -2px rgba(230, 138, 23, 0.6) inset;
+    transition: 0.5s;
+    cursor: pointer;
+}
+
+.input-text-create {
+    width: 250px;
+}
+
+.input-text:hover {
+    border: 1px solid $secondary;
+}
+
+.input-text:focus {
+    color: #ffffff;
+    font-weight: 600;
+    background-color: $secondaryLight;
+}
+
+.input-color {
+    padding: 1px;
+    width: 30px;
+    height: 24px;
+    border: 1px solid $primaryLighter;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: 600;
+    color: $secondary;
+    cursor: pointer;
+    background-color: $primaryLighter;
+    box-shadow: -1px -1px 20px 2px rgba(230, 138, 23, 0.6) inset;
+    transition: 0.5s;
+}
+
+.input-color:hover {
+    background-color: $primary;
+}
